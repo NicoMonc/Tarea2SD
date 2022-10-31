@@ -61,7 +61,6 @@ const consventas = async () => {
     await consumerventas.subscribe({ topic: 'ventas' })
     await consumerventas.run({
         eachMessage: async ({ topic, partition, message }) => {
-            console.log("mensaje")
             if(message.value){
                 var data= JSON.parse(message.value.toString())
                 //relleno stock
@@ -86,6 +85,33 @@ const consventas = async () => {
       })
 }
 
+const miembros= async()=>{
+    const consumermiembros = kafka.consumer({ groupId: 'miembros', fromBeginning: true })
+    const consumervip = kafka.consumer({ groupId: 'miembros', fromBeginning: true })
+    const consumerplebe = kafka.consumer({ groupId: 'miembros', fromBeginning: true })
+    await consumermiembros.connect()
+    await consumermiembros.subscribe({ topic: 'miembros' })
+    await consumermiembros.run({
+        eachMessage:async({topic, partition, message}) =>{
+            if(message.value){
+                var data= JSON.parse(message.value.toString())
+                /*
+                if(data.premium=="Si"){
+                    await consumervip.connect()
+                    await consumervip.run({
+                        console.log("Miembro vip")
+                    })
+                }else{
+                    await consumerplebe.connect()
+                    await consumerplebe.run({
+                        console.log("Miembro plebe")
+                    })
+                }*/
+            }
+        }
+    })
+}
+
 
 app.get("/findia", async (req, res) => {
     res.send.json({
@@ -107,4 +133,5 @@ app.listen(port, () => {
     console.log(`Consumidor funcionando en puerto ${port}`);
     consventas();
     reportes();
+    miembros();
 });
