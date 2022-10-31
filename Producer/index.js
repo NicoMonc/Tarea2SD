@@ -36,7 +36,7 @@ app.post('/miembro', async (req, res) =>{
   const corrcarrito = await client.query('SELECT * FROM carritos where patente = $1',[miembro.patente])
   
   if(corrusuario.rowCount!=0 || corrcarrito.rowCount!=0){
-    res.send("Usuario o carrito ya está registrado")
+    res.send("Usuario y/o carrito ya está registrado")
   }else{
     const miembrodata = 'INSERT INTO miembros(nombre, apellido, rut,email,patenteCar,premium) VALUES ($1, $2, $3,$4,$5,$6)'
     await client.query(miembrodata, [miembro.name, miembro.lastname, miembro.rut,miembro.email,miembro.patente,miembro.premium])
@@ -72,8 +72,8 @@ app.post('/venta', async (req, res) =>{
     if(restante<0){
       res.send("Cantidad solicitada mayor a stock actual")
     }else{
-      const ventadata = 'INSERT INTO ventas(cliente, cant, hora,stock,ubi) VALUES ($1, $2, $3,$4,$5)'
-      await client.query(ventadata, [venta.cliente, venta.sopaipas, venta.hora,restante,venta.ubicacion])
+      const ventadata = 'INSERT INTO ventas(cliente,patente, cant, hora,stock,ubi) VALUES ($1, $2, $3,$4,$5,$6)'
+      await client.query(ventadata, [venta.cliente,venta.patente, venta.sopaipas, venta.hora,restante,venta.ubicacion])
       const updateCarrito = 'UPDATE carritos SET ubicacion = $1, stock= $2 WHERE patente= $3'
       await client.query(updateCarrito, [venta.ubicacion, restante, venta.patente])
       
@@ -91,15 +91,34 @@ app.post('/venta', async (req, res) =>{
   }
 })
 
+app.post('/verificacion', async (req,res)=>{
+  var patente=req.body.patente
+  var ubicacion= req.body.ubicacion
+  req.body.situacion= "actualizacion"
+  const updateCarrito = 'UPDATE carritos SET ubicacion = $1 WHERE patente= $2'
+  await client.query(updateCarrito, [ubicacion, patente])
+  await producer.connect();
+      await producer.send({
+          topic: 'reportes',
+          messages: [{value: JSON.stringify(req.body)}]
+      })
+      await producer.disconnect().then(
+          res.status(200).json({
+            "Estado":"Completado"
+        })
+      ) 
+})
+
 app.post('/aviso' , async (req, res) =>{
   var patente = req.body.patente;
   var ubicacion = req.body.ubicacion
+  req.body.situacion = "alerta"
   const infocarrito = await client.query('SELECT patente,ubicacion FROM carritos where patente = $1',[patente])
   var ubiactual= infocarrito.rows[0].ubicacion
   if(ubiactual==ubicacion){
     res.send("Señora, es la misma ubicacion :D")
   }else{
-    const ventadata = 'INSERT INTO reportes(patente,ubi) VALUES ($1, $2'
+    const ventadata = 'INSERT INTO reportes(patente,ubi) VALUES ($1, $2)'
     await client.query(ventadata, [patente,ubicacion])
     await producer.connect();
       await producer.send({
@@ -115,5 +134,5 @@ app.post('/aviso' , async (req, res) =>{
 })
 
 app.listen(port, () => {
-  console.log(`Codigo tarea 2 funcionando en puerto ${port}`)
+  console.log(`Productor funcionando en puerto ${port}`)
 })

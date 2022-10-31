@@ -4,14 +4,13 @@ DROP DATABASE IF EXISTS sopaipillas;
 CREATE DATABASE sopaipillas;
 \c sopaipillas;
 CREATE TABLE miembros (
-    id SERIAL NOT NULL,
+    rut int NOT NULL,
     nombre varchar NOT NULL,
     apellido varchar NOT NULL,
-    rut int NOT NULL,
     email varchar NOT NULL,
     patenteCar varchar NOT NULL,
     premium varchar NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (rut)
 );
 
 CREATE TABLE carritos (
@@ -25,6 +24,7 @@ CREATE TABLE carritos (
 CREATE TABLE ventas (
     id SERIAL NOT NULL,
     cliente int NOT NULL,
+    patente varchar NOT NULL,
     cant int NOT NULL,
     hora timestamp NOT NULL,
     stock int NOT NULL,
