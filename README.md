@@ -8,3 +8,5 @@ Para esta tarea se trabajó con nodejs + las siguientes librerias:
 - express: https://expressjs.com
 - cors: https://expressjs.com/en/resources/middleware/cors.html
 - node-schedule: https://www.npmjs.com/package/node-schedule (Programar "eventos" en nodejs)
+
+## Video entrega: https://youtu.be/xeLzVBfff-U
