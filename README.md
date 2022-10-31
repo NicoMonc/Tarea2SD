@@ -10,3 +10,4 @@ Para esta tarea se trabajó con nodejs + las siguientes librerias:
 - node-schedule: https://www.npmjs.com/package/node-schedule (Programar "eventos" en nodejs)
 
 ## Video entrega: https://youtu.be/xeLzVBfff-U
+## Informe: https://github.com/NicoMonc/Tarea2SD/blob/main/Informe%20Tarea%202.pdf
